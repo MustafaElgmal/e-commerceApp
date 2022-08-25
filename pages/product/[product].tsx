@@ -1,7 +1,8 @@
 import { StarIcon } from '@heroicons/react/solid'
 import Layout from 'components/layout'
 import { classNames } from 'lib'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getRecords } from 'utils/function'
 
 const product = {
   name: 'Basic Tee 6-Pack',
@@ -95,7 +96,6 @@ export default function ProductPage() {
   const [open, setOpen] = useState(false)
   const [selectedColor, setSelectedColor] = useState(product.colors[0])
   const [selectedSize, setSelectedSize] = useState(product.sizes[2])
-
   return (
     <Layout>
       <main className="pt-10 sm:pt-8 md:pt-0">

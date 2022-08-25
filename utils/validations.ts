@@ -1,44 +1,38 @@
-import { convertFromSheetsToJson } from 'utiles/function'
+import { OrderCreate } from './../types/index'
+import {
+  convertFromSheetsToJson,
+  createImageSrc,
+  getRecords,
+} from 'utils/function'
 import {
   Category,
-  CtaegoryCreate,
+  CategoryCreate,
   errors,
   ProductCreate,
   User,
   UserCreate,
-} from './../types/index'
+} from '../types/index'
 import validator from 'validator'
 
-export const userVaildation = async (user: UserCreate): Promise<errors[]> => {
+export const OrderVaildation = async (
+  order: OrderCreate
+): Promise<errors[]> => {
   let errors: errors[] = []
-  const { firstName, lastName, email, password } = user
+  const { firstName, lastName, address, phoneNumber,orderItems } = order
   if (!firstName) {
     errors.push({ message: 'FirstName is required!' })
   }
   if (!lastName) {
     errors.push({ message: 'LirstName is required!' })
   }
-  if (!email) {
-    errors.push({ message: 'Email is required!' })
-  } else {
-    if (!validator.isEmail(email)) {
-      errors.push({ message: 'Email is not vaild!' })
-    }
-    const users = await convertFromSheetsToJson('user')
-    const userFind:User= users.user.find((user: User) => user.email === email)
-    if (userFind) {
-      errors.push({ message: 'email is already exists!' })
-    }
+  if (!address) {
+    errors.push({ message: 'address is required!' })
   }
-  if (!password) {
-    errors.push({ message: 'Password is required!' })
-  } else {
-    if (!validator.isStrongPassword(password)) {
-      errors.push({
-        message:
-          'Password should be strong ! {minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1}',
-      })
-    }
+  if (!phoneNumber) {
+    errors.push({ message: 'phoneNumber is required!' })
+  }
+  if (orderItems===undefined||orderItems.length === 0) {
+    errors.push({ message: 'OrderItems is required!' })
   }
   return errors
 }
@@ -48,7 +42,7 @@ export const productValidation = async (
   categoryId: string
 ): Promise<errors[]> => {
   let errors: errors[] = []
-  const { name, href, price, description, availableQty, imageSrc, imageAlt } =
+  const { name, href, price, description, availableQty,details,highlights,images} =
     product
   if (!name) {
     errors.push({ message: 'Name is required!' })
@@ -65,29 +59,29 @@ export const productValidation = async (
   if (!availableQty) {
     errors.push({ message: 'availableQty is required!' })
   }
-  if (!imageSrc) {
-    errors.push({ message: 'imageSrc is required!' })
-  } else {
-    if (!validator.isURL(imageSrc)) {
-      errors.push({ message: 'imageSrc is  not vaild!' })
-    }
+  if(!highlights){
+    errors.push({ message: ' highlights is required!' })
+
   }
-  if (!imageAlt) {
-    errors.push({ message: 'Name is required!' })
+  if(!details){
+    errors.push({ message: ' details is required!' })
+
   }
   const categories = await convertFromSheetsToJson('category')
-  const category:CtaegoryCreate = categories.category.find(
-    (category: CtaegoryCreate) => category.id === categoryId
+  const category: CategoryCreate = categories.category.find(
+    (category: Category) => category.id === categoryId
   )
   if (!category) {
     errors.push({ message: 'CategorId is not found!' })
   }
-
+  if(images.length===0){
+    errors.push({ message: 'Images is not found!' })
+  }
   return errors
 }
 
 export const categoryValidation = async (
-  category: CtaegoryCreate
+  category: CategoryCreate
 ): Promise<errors[]> => {
   let errors: errors[] = []
   const { name, imageSrc, imageAlt, href } = category
@@ -95,8 +89,8 @@ export const categoryValidation = async (
     errors.push({ message: 'Name is required!' })
   } else {
     const categories = await convertFromSheetsToJson('category')
-    const categoryFind:CtaegoryCreate = categories.category.find(
-      (category:CtaegoryCreate) => category.name === name
+    const categoryFind: CategoryCreate = categories.category.find(
+      (category: CategoryCreate) => category.name === name
     )
     if (categoryFind) {
       errors.push({ message: 'category is already exists!' })

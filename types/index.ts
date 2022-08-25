@@ -3,21 +3,20 @@ export interface ProductCreate{
   href: string
   price: number
   availableQty: number
-  imageSrc: string
-  imageAlt: string
-  description:string
-
+  images:{src:string,alt:string}[]
+  description:string,
+  details:string,
+  highlights:string
 }
 export interface Product extends ProductCreate  {
   id: string
- color:string
+  images:ImageType[]
 }
 export interface UserCreate{
   firstName:string
   lastName:string
   email:string
   password:string
-
 }
 export interface User extends UserCreate{
   id:string
@@ -25,21 +24,25 @@ export interface User extends UserCreate{
 export interface errors{
   message:string
 }
+export interface ImageType{
+  id:string,
+  src:string,
+  alt:string,
+  productId:string
+}
 
 
 export interface CartItem extends Product {
   quantity: number
 }
-export interface CtaegoryCreate{
-  id?:string
+export interface CategoryCreate{
   name:string
   imageSrc:string
   imageAlt:string
   href:string
 }
-export type Category = {
-  name: string
-  featured: Product[]
+export interface Category extends CategoryCreate {
+  id:string
 }
 
 export type AppStateType = {
@@ -54,4 +57,15 @@ export type Page = {
 }
 export type Navigation = {
   categories: Category[]
+}
+
+export interface OrderCreate{
+  firstName:string,
+  lastName:string,
+  address:string
+  phoneNumber:string
+  orderItems:{productId: string; Qty: number }[]
+}
+export interface Order extends OrderCreate{
+  id:string
 }

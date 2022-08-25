@@ -1,9 +1,7 @@
-import { categoryValidation } from './../../../utiles/validations'
-import { getCategories } from './../../../utiles/function'
-
+import { categoryValidation } from '../../../utils/validations'
+import { createRecord, getRecords } from '../../../utils/function'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { uuid } from 'uuidv4'
-import { google } from 'googleapis'
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,19 +14,23 @@ export default async function handler(
         return res.status(400).json({ messages: errors })
       }
       try {
+        const id = uuid()
         const { name, imageSrc, imageAlt, href } = req.body
-        // values: [[id, name, href, imageSrc, imageAlt]],
-        const category = await createRecords(,)
+        const category = await createRecord(
+          [id,name, href, imageSrc, imageAlt],
+          'category!A1:E1',
+          
+        )
 
-        res.status(201).json({ category: category.config.data.values })
+        res.status(201).json({message:'Category is created !'})
       } catch (e) {
         res.status(500).json({ error: 'Api not found' })
       }
       break
     case 'GET':
       try {
-        const categories = await getCategories()
-        res.json({ categories })
+        const categories = await getRecords('category')
+        res.json({ categories: categories.category })
       } catch (e) {
         res.status(500).json({ error: 'Server is down!' })
       }
@@ -37,25 +39,4 @@ export default async function handler(
     default:
       res.status(500).json({ error: 'Server is down!' })
   }
-}
-
-async function createRecords(values: string[], range: string) {
-  const id = uuid()
-  const auth = new google.auth.GoogleAuth({
-    keyFile: process.env.KEYFILE,
-    scopes: process.env.SCOPE,
-  })
-  const client = await auth.getClient()
-  const googlesheets = google.sheets({ version: 'v4', auth: client })
-  const spreadsheetId = process.env.SHEETID
-  const row = await googlesheets.spreadsheets.values.append({
-    auth,
-    spreadsheetId,
-    range,
-    valueInputOption: 'USER_ENTERED',
-    requestBody: {
-      values: [[id,...values]],
-    },
-  })
-  return row
 }
