@@ -1,6 +1,7 @@
 import { Popover, Transition } from '@headlessui/react'
 import { MenuIcon, ShoppingBagIcon } from '@heroicons/react/outline'
 import { classNames } from 'lib'
+import Link from 'next/link'
 import { Fragment, useState } from 'react'
 import Drawer from './drawer'
 import ShoppingCartDrawer from './shoppingCartDrawer'
@@ -101,16 +102,16 @@ function Header() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 {/* Logo (lg+) */}
-                <div className="hidden lg:flex lg:flex-1 lg:items-center">
-                  <a href="#">
-                    <span className="sr-only">Workflow</span>
+
+                <Link href="/">
+                  <div className="hidden lg:flex lg:flex-1 lg:items-center" style={{cursor:'pointer'}}>
                     <img
                       className="h-8 w-auto"
                       src="https://tailwindui.com/img/logos/workflow-mark.svg?color=indigo&shade=600"
                       alt=""
                     />
-                  </a>
-                </div>
+                  </div>
+                </Link>
 
                 <div className="hidden h-full lg:flex">
                   {/* Flyout menus */}
@@ -210,8 +211,6 @@ function Header() {
                           )}
                         </Popover>
                       ))}
-
-
                     </div>
                   </Popover.Group>
                 </div>
@@ -245,7 +244,10 @@ function Header() {
                   >
                     {/* Cart */}
                     <div className="ml-4 flow-root lg:ml-8">
-                      <a href="#" className="group -m-2 flex items-center p-2">
+                      <div
+                        className="group -m-2 flex items-center p-2"
+                        style={{ cursor: 'pointer' }}
+                      >
                         <ShoppingBagIcon
                           className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                           aria-hidden="true"
@@ -254,7 +256,7 @@ function Header() {
                           0
                         </span>
                         <span className="sr-only">items in cart, view bag</span>
-                      </a>
+                      </div>
                     </div>
                   </div>
                 </div>
