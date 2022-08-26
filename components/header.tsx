@@ -3,6 +3,7 @@ import { MenuIcon, ShoppingBagIcon } from '@heroicons/react/outline'
 import { classNames } from 'lib'
 import Link from 'next/link'
 import { Fragment, useState } from 'react'
+import { useAppSelector } from 'redux/app/hookes'
 import Drawer from './drawer'
 import ShoppingCartDrawer from './shoppingCartDrawer'
 const navigation = {
@@ -86,7 +87,7 @@ const navigation = {
 function Header() {
   const [open, setOpen] = useState(false)
   const [openShoppingCart, setOpenShoppingCart] = useState(false)
-
+  const orders=useAppSelector((state)=>state.cart.orders)
   return (
     <>
       <Drawer open={open} setOpen={setOpen} />
@@ -253,7 +254,7 @@ function Header() {
                           aria-hidden="true"
                         />
                         <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                          0
+                          {orders.length}
                         </span>
                         <span className="sr-only">items in cart, view bag</span>
                       </div>

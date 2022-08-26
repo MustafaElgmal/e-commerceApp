@@ -2,44 +2,24 @@ import { RadioGroup } from '@headlessui/react'
 import { CheckCircleIcon, TrashIcon } from '@heroicons/react/solid'
 import Dropdown from 'components/dropdown'
 import Layout from 'components/layout'
+import produce from 'immer'
 import { classNames } from 'lib'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useAppSelector } from 'redux/app/hookes'
+import { removeFromCart } from 'redux/features/cartSlice'
+import { CartItem } from 'types'
+import sgMail from '@sendgrid/mail'
+import { postProduct } from 'utils/apis'
 
-const products = [
-  {
-    id: 1,
-    title: 'Basic Tee',
-    href: '#',
-    price: '$32.00',
-    color: 'Black',
-    size: 'Large',
-    imageSrc:
-      'https://tailwindui.com/img/ecommerce-images/checkout-page-02-product-01.jpg',
-    imageAlt: "Front of men's Basic Tee in black.",
-    availableQty: 10,
-  },
-  {
-    id: 2,
-    title: 'Emad Tee',
-    href: '#',
-    price: '$32.00',
-    color: 'Black',
-    size: 'Large',
-    imageSrc:
-      'https://tailwindui.com/img/ecommerce-images/checkout-page-02-product-01.jpg',
-    imageAlt: "Front of men's Basic Tee in black.",
-    availableQty: 6,
-  },
-  // More products...
-]
 const deliveryMethods = [
   {
     id: 1,
     title: 'Standard',
     turnaround: '4–10 business days',
-    price: '$5.00',
+    price: '5.00',
   },
-  { id: 2, title: 'Express', turnaround: '2–5 business days', price: '$16.00' },
+  { id: 2, title: 'Express', turnaround: '2–5 business days', price: '16.00' },
 ]
 const paymentMethods = [
   { id: 'credit-card', title: 'Credit card' },
@@ -52,6 +32,24 @@ export default function Example() {
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(
     deliveryMethods[0]
   )
+  const products=useAppSelector((state)=>state.cart.orders)
+  const dispatch=useDispatch()
+  const removeItemFromCart=(product:CartItem)=>{
+    dispatch(removeFromCart(product))
+  }
+  const [supTotal,setSupTotal]=useState<number>()
+  const calcSupTotal=()=>{
+    let sum=0
+    products.forEach((product)=>sum+=parseInt(product.price))
+    setSupTotal(sum)
+  }
+  const postOrder=async()=>{
+    // await postProduct()
+  }
+  useEffect(()=>{
+    calcSupTotal()
+
+  },[products])
 
   return (
     <Layout>
@@ -476,8 +474,8 @@ export default function Example() {
                       <li key={product.id} className="flex py-6 px-4 sm:px-6">
                         <div className="flex-shrink-0">
                           <img
-                            src={product.imageSrc}
-                            alt={product.imageAlt}
+                            src={product.images[0].src}
+                            alt={product.images[0].alt}
                             className="w-20 rounded-md"
                           />
                         </div>
@@ -490,26 +488,23 @@ export default function Example() {
                                   href={product.href}
                                   className="font-medium text-gray-700 hover:text-gray-800"
                                 >
-                                  {product.title}
+                                  {product.name}
                                 </a>
                               </h4>
-                              <p className="mt-1 text-sm text-gray-500">
-                                {product.color}
-                              </p>
-                              <p className="mt-1 text-sm text-gray-500">
-                                {product.size}
-                              </p>
                             </div>
 
                             <div className="ml-4 flow-root flex-shrink-0">
                               <button
                                 type="button"
+                                
                                 className="-m-2.5 flex items-center justify-center bg-white p-2.5 text-gray-400 hover:text-gray-500"
                               >
                                 <span className="sr-only">Remove</span>
                                 <TrashIcon
                                   className="h-5 w-5"
                                   aria-hidden="true"
+                                  onClick={()=>removeItemFromCart(product)}
+                                  
                                 />
                               </button>
                             </div>
@@ -543,13 +538,13 @@ export default function Example() {
                     <div className="flex items-center justify-between">
                       <dt className="text-sm">Subtotal</dt>
                       <dd className="text-sm font-medium text-gray-900">
-                        $64.00
+                       {`$${supTotal}`}
                       </dd>
                     </div>
                     <div className="flex items-center justify-between">
                       <dt className="text-sm">Shipping</dt>
                       <dd className="text-sm font-medium text-gray-900">
-                        $5.00
+                        {`$${selectedDeliveryMethod.price}`}
                       </dd>
                     </div>
                     <div className="flex items-center justify-between">
@@ -561,7 +556,7 @@ export default function Example() {
                     <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                       <dt className="text-base font-medium">Total</dt>
                       <dd className="text-base font-medium text-gray-900">
-                        $75.52
+                        {`$${supTotal!+5.52+parseInt(selectedDeliveryMethod.price)}`}
                       </dd>
                     </div>
                   </dl>
@@ -569,6 +564,7 @@ export default function Example() {
                   <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
                     <button
                       type="submit"
+                      onClick={()=>postOrder()}
                       className="w-full rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
                     >
                       Confirm order

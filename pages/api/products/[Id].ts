@@ -1,4 +1,4 @@
-import { Product } from 'types'
+import { ImageType, Product } from 'types'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {
   convertFromSheetsToJson,
@@ -58,13 +58,15 @@ export default async function handler(
     case 'GET':
       try {
         const products = await getRecords('product')
-        const product = products.product.find(
+       const product = products.product.find(
           (product: Product) => product.id.toString() === Id
         )
         if (!product) {
           return res.status(404).json({ message: 'Product is not found!' })
         }
-        res.json({ product })
+        const images=await getRecords('image')
+        const imagesFilter=images.image.filter((image:ImageType)=>image.productId===product.id)
+        res.json({ product:{...product,images:imagesFilter} })
       } catch (e) {
         res.status(500).json({ error: 'Server is down!' })
       }

@@ -1,7 +1,7 @@
 export interface ProductCreate{
   name: string
   href: string
-  price: number
+  price: string
   availableQty: number
   images:{src:string,alt:string}[]
   description:string,
@@ -68,4 +68,19 @@ export interface OrderCreate{
 }
 export interface Order extends OrderCreate{
   id:string
+}
+export interface InfoType{
+  firstName:string
+  lastName:string
+  email:string
+  company:string
+  address:string
+  apartment:string
+  city:string
+  country:string
+  state:string
+  postalCode:string
+  phone:string
+  deliveryMethod:string
+  
 }

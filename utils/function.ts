@@ -5,6 +5,7 @@ import { extractSheets } from 'spreadsheet-to-json'
 import bcrypt from 'bcrypt'
 import { uuid } from 'uuidv4'
 import validator from 'validator'
+import sgMail from '@sendgrid/mail'
 
 export const convertFromSheetsToJson = (sheetName: string) => {
   const data = extractSheets(
@@ -88,7 +89,7 @@ export const createOrderItems = async (
 }
 
 export const createImageSrc = async (
-  images: { src: string,alt:string }[],
+  images: { src: string; alt: string }[],
   productId: string
 ) => {
   try {
@@ -97,15 +98,21 @@ export const createImageSrc = async (
         return { message: 'image is  not vaild!' }
       }
       const id = uuid()
-      await createRecord([id, images[i].src,images[i].alt, productId], 'image!A1:D1')
+      await createRecord(
+        [id, images[i].src, images[i].alt, productId],
+        'image!A1:D1'
+      )
     }
-    return {message: ''}
+    return { message: '' }
   } catch (e) {
     throw e
   }
 }
 
-export const getImages=async()=>{
-  
-}
+export const generationCode=()=>{
+  const min=100000
+  const max=1000000
+  const code=Math.floor(Math.random()*(max-min+1))+min
 
+  return `E-${code}`
+}
