@@ -39,6 +39,11 @@ export interface ProductWithExtra extends Product{
   colors:ColorType[]
   sizes:SizeType[]
 }
+export interface CartItem extends ProductWithExtra {
+  quantity: number,
+  color:string,
+  size:string
+}
 export interface ImageType {
   id: string
   src: string
@@ -73,12 +78,6 @@ export interface errors {
   message: string
 }
 
-
-export interface CartItem extends ProductWithExtra {
-  quantity: number,
-  color:string,
-  size:string
-}
 export interface CategoryCreate {
   name: string
   imageSrc: string

@@ -27,6 +27,7 @@ export const convertFromSheetsToJson = (sheetsName: string[]) => {
 
 export const getRecords = async (sheetsName: string[]) => {
   try {
+    
     const rows = await convertFromSheetsToJson(sheetsName)
     return rows
   } catch (e) {

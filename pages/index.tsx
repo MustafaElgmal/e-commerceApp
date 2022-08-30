@@ -64,6 +64,7 @@ const Home: NextPage = ({products,categories}:PropsType) => {
       <Layout>
         <main>
           {/* Hero section */}
+
           <div className="relative">
             {/* Background image and overlap */}
             <div

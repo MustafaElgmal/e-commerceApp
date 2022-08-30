@@ -10,18 +10,25 @@ export const orderSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action: PayloadAction<CartItem>) => {
-      const product = state.orders.find(
-        (order) => order.id === action.payload.id
+      const order = state.orders.find(
+        (order) =>
+          order.id === action.payload.id &&
+          order.color === action.payload.color &&
+          order.size === action.payload.size
       )
-      if (
-        !product ||
-        product.color !== action.payload.color ||
-        product.size !== action.payload.size
-      ) {
-        state.orders = [...state.orders, action.payload]
+      if (!order) {
+        if(parseInt(action.payload.availableQty)>=action.payload.quantity){
+          state.orders = [...state.orders, action.payload]
+        }else{
+          alert('Product out of stock!')
+        }
+        
+        
       } else {
         state.orders = state.orders.map((order) =>
-          order.id === action.payload.id
+          order.id === action.payload.id &&
+          order.color === action.payload.color &&
+          order.size === action.payload.size
             ? { ...order, quantity: action.payload.quantity }
             : order
         )
@@ -30,7 +37,9 @@ export const orderSlice = createSlice({
     },
     removeFromCart: (state, action: PayloadAction<CartItem>) => {
       state.orders = state.orders.filter(
-        (order) => order.id !== action.payload.id
+        (order) => order.id !== action.payload.id &&
+        order.color !== action.payload.color &&
+        order.size !== action.payload.size
       )
       setToStorage('cart', state)
     },
