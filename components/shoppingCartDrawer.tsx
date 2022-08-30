@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from 'redux/app/hookes'
-import { removeFromCart } from 'redux/features/cartSlice'
+import { addToCart, removeFromCart } from 'redux/features/cartSlice'
 import { CartItem, Product } from 'types'
 import Dropdown from './dropdown'
 
@@ -15,22 +15,26 @@ type props = {
 }
 
 export default function ShoppingCartDrawer({ open, setOpen }: props) {
-  const cart=useAppSelector((state)=>state.cart.orders)
-  const [supTotal,setSupTotal]=useState<number>()
-  const dispatch=useDispatch()
-  const removeItemFromCart=(product:CartItem)=>{
+  const cart = useAppSelector((state) => state.cart.orders)
+  const [supTotal, setSupTotal] = useState<number>()
+  const dispatch = useDispatch()
+  const removeItemFromCart = (product: CartItem) => {
     dispatch(removeFromCart(product))
+    if (cart.length === 1) {
+      setOpen(false)
+    }
   }
-  const calcSupTotal=()=>{
-    let sum=0
-    cart.forEach((product)=>sum+=parseInt(product.price))
+  const calcSupTotal = () => {
+    let sum = 0
+    cart.forEach(
+      (product) => (sum += parseInt(product.price) * product.quantity)
+    )
     setSupTotal(sum)
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     calcSupTotal()
-
-  },[cart])
+  }, [cart])
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -97,26 +101,44 @@ export default function ShoppingCartDrawer({ open, setOpen }: props) {
                                 <div className="ml-4 flex flex-1 flex-col">
                                   <div>
                                     <div className="flex justify-between text-base font-medium text-gray-900">
-                                      <h3>
-                                        <a href={product.href}>
+                                      <h3 onClick={() => setOpen(false)}>
+                                        <Link href={`/product/${product.id}`}>
+                                        <a >
                                           {' '}
                                           {product.name}{' '}
                                         </a>
+                                        </Link>
                                       </h3>
-                                      <p className="ml-4">{product.price}</p>
+                                      <p className="ml-1">{`$${product.price}`}</p>
                                     </div>
-                  
+                                    <div className="mt-1 flex text-sm">
+                                      <p className="text-gray-500">
+                                        {product.color}
+                                      </p>
+                                      {product.size ? (
+                                        <p className="ml-4 border-l border-gray-200 pl-4 text-gray-500">
+                                          {product.size}
+                                        </p>
+                                      ) : null}
+                                    </div>
+                                   
                                   </div>
                                   <div className="flex flex-1 items-end justify-between text-sm">
                                     <p className="text-gray-500">
                                       <Dropdown
-                                        onChange={() => {
-                                          console.log('hello world')
+                                        onChange={(value) => {
+                                          dispatch(
+                                            addToCart({
+                                              ...product,
+                                              quantity: parseInt(value),
+                                            })
+                                          )
                                         }}
                                         values={Array.from(
-                                          Array(product.availableQty),
+                                          Array(parseInt(product.availableQty)),
                                           (_, i) => i + 1
                                         )}
+                                        defaultValue={product.quantity}
                                       />
                                     </p>
 
@@ -124,7 +146,9 @@ export default function ShoppingCartDrawer({ open, setOpen }: props) {
                                       <button
                                         type="button"
                                         className="font-medium text-indigo-600 hover:text-indigo-500"
-                                        onClick={()=>removeItemFromCart(product)}
+                                        onClick={() =>
+                                          removeItemFromCart(product)
+                                        }
                                       >
                                         Remove
                                       </button>
@@ -148,7 +172,10 @@ export default function ShoppingCartDrawer({ open, setOpen }: props) {
                       </p>
                       <div className="mt-6">
                         <Link href="/checkout">
-                          <button className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700" style={{width:'100%'}}>
+                          <button
+                            className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                            style={{ width: '100%' }}
+                          >
                             Checkout
                           </button>
                         </Link>

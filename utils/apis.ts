@@ -1,45 +1,17 @@
-import { ImageType, InfoType } from '../types/index';
-import { Base_Url } from '../constans/index';
-import axios from "axios"
-import { convertFromSheetsToJson, getRecords } from './function';
+import { OrderCreate } from './../types/index';
+import axios from 'axios';
+import { Base_Url } from './../constans/index';
 
-export const getCategories=async(setCollections:Function)=>{
+export const createOrder=async(order:OrderCreate)=>{
     try{
-        const res=await axios.get(`${Base_Url}/api/categories`)
-        setCollections(res.data.categories)
-    }catch(e){
-        console.log(e)
-    }
-
-}
-
-export const getProduct=async(setProduct:Function,productId:string)=>{
-    try{
-        console.log(productId)
-        const res=await axios.get(`${Base_Url}/api/products/${productId}`)
-        setProduct(res.data.product)
-    }catch(e){
-        console.log(e)
-    }
-
-}
-
-
-export const getProducts=async(setProducts:Function)=>{
-    try{
-        const res=await axios.get(`${Base_Url}/api/products`)
-        setProducts(res.data.products)
-    }catch(e){
-        console.log(e)
-    }
-
-}
-export const postProduct=async(information:InfoType,orderItems:{productId:string,Qty:number})=>{
-    try{
-        const res=await axios.post(`${Base_Url}/api/orders`,{...information,orderItems})
+        const res=await axios.post(`${Base_Url}/api/orders`,order)
         alert('Order is created!')
-    }catch(e){
+    }catch(e:any){
+       if(e.status!==500){
+        alert('Order is not created!')
+       }else{
         console.log(e)
+       }
     }
 
 }

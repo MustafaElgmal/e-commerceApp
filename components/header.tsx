@@ -90,7 +90,7 @@ function Header() {
   const orders=useAppSelector((state)=>state.cart.orders)
   return (
     <>
-      <Drawer open={open} setOpen={setOpen} />
+      {/* <Drawer open={open} setOpen={setOpen} /> */}
       <ShoppingCartDrawer
         open={openShoppingCart}
         setOpen={setOpenShoppingCart}
@@ -241,7 +241,7 @@ function Header() {
                 <div className="flex flex-1 items-center justify-end">
                   <div
                     className="flex items-center lg:ml-8"
-                    onClick={() => setOpenShoppingCart(true)}
+                    onClick={() => orders.length>0?setOpenShoppingCart(true):null}
                   >
                     {/* Cart */}
                     <div className="ml-4 flow-root lg:ml-8">

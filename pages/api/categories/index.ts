@@ -29,7 +29,7 @@ export default async function handler(
       break
     case 'GET':
       try {
-        const categories = await getRecords('category')
+        const categories = await getRecords(['category'])
         res.json({ categories: categories.category })
       } catch (e) {
         res.status(500).json({ error: 'Server is down!' })

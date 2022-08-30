@@ -1,3 +1,4 @@
+import { captilize } from './../../../utils/function'
 import {
   createOrderItems,
   generationCode,
@@ -23,25 +24,45 @@ export default async function handler(
 
       try {
         const id = uuid()
-        let { email,firstName, lastName, address, phoneNumber, orderItems } = req.body
+        const {
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          company,
+          address,
+          apartment,
+          city,
+          country,
+          state,
+          postalCode,
+          deliveryMethod,
+          orderItems,
+        } = req.body
         const error = await createOrderItems(orderItems, id)
         if (error.message !== '') {
           return res.status(400).send(error)
         }
         const order = await createRecord(
-          [id, firstName, lastName, address, phoneNumber],
-          'order!A1:E1'
+          [
+            id,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            company,
+            address,
+            apartment,
+            city,
+            country,
+            state,
+            postalCode,
+            deliveryMethod,
+          ],
+          'order!A1:M1'
         )
-        sendingConvermationEmail(email,firstName)
+        sendingConvermationEmail(email, firstName)
         res.json({ message: 'Order is created!' })
-      } catch (e) {
-        res.status(500).json({ error: 'Server is down!' })
-      }
-      break
-    case 'GET':
-      try {
-        const orders = await getRecords('order')
-        res.json({ orders: orders.order })
       } catch (e) {
         res.status(500).json({ error: 'Server is down!' })
       }
@@ -53,14 +74,15 @@ export default async function handler(
 
 const sendingConvermationEmail = (email: string, name: string) => {
   sgmail.setApiKey(process.env.EMAIL_KEY as string)
+  name = captilize(name)
   const code = generationCode()
   const mail = {
     to: email,
     from: 'reviews6767@gmail.com',
     subject: 'Confirmation',
-    text: `Dear,${name}
+    text: `Dear, ${name}
 
-       ${code} is your Order code.
+       ${code} is your Order number.
       
       Thanks,
       The e-commerce website Team`,

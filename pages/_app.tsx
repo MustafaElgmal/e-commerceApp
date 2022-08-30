@@ -7,6 +7,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
       <Component {...pageProps} />
+      <div className='bg-rose-600' hidden></div>
     </Provider>
   )
 }

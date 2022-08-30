@@ -1,21 +1,32 @@
 import type { NextPage } from 'next'
 import Layout from 'components/layout'
 import { useEffect, useState } from 'react'
-import { Category } from 'types'
-import { getCategories } from 'utils/apis'
+import { Category, Product, PropsType } from 'types'
+import { Base_Url } from 'constans'
+import axios from 'axios'
+import Link from 'next/link'
+import { useDispatch } from 'react-redux'
+import { setProducts } from 'redux/features/productsSlice'
 
-const trendingProducts = [
-  {
-    id: 1,
-    name: 'Leather Long Wallet',
-    color: 'Natural',
-    price: '$75',
-    href: '#',
-    imageSrc:
-      'https://tailwindui.com/img/ecommerce-images/home-page-04-trending-product-02.jpg',
-    imageAlt: 'Hand stitched, orange leather long wallet.',
+export const getStaticProps=async()=>{
+  let products:Product[]=[],categories:Category[]=[]
+  try{
+    const res=await axios.get(`${Base_Url}/api/categories`)
+    const res2=await axios.get(`${Base_Url}/api/products`)
+     categories=res.data.categories
+     products=res2.data.products
+  }catch(e){
+    console.log(e)
   }
-]
+  return{
+    props:{
+      categories,
+      products
+    }
+  }
+ 
+}
+
 const perks = [
   {
     name: 'Free returns',
@@ -47,15 +58,7 @@ const perks = [
   },
 ]
 
-const Home: NextPage = () => {
-  const [collections,setCollections]=useState<Category[]>([])
-  const getAllCollections=async()=>{
-    await getCategories(setCollections)
-  }
-  useEffect(()=>{
-    getAllCollections()
-
-  },[])
+const Home: NextPage = ({products,categories}:PropsType) => {
   return (
     <div className="">
       <Layout>
@@ -121,7 +124,7 @@ const Home: NextPage = () => {
                 Collections
               </h2>
               <div className="mx-auto grid max-w-md grid-cols-1 gap-y-6 px-4 sm:max-w-7xl sm:grid-cols-3 sm:gap-y-0 sm:gap-x-6 sm:px-6 lg:gap-x-8 lg:px-8">
-                {collections.map((collection) => (
+                {categories?.map((collection) => (
                   <div
                     key={collection.name}
                     className="group relative h-96 rounded-lg bg-white shadow-xl sm:aspect-w-4 sm:aspect-h-5 sm:h-auto"
@@ -178,26 +181,26 @@ const Home: NextPage = () => {
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 md:gap-y-0 lg:gap-x-8">
-                {trendingProducts.map((product) => (
+                {products?.map((product) => (
                   <div key={product.id} className="group relative">
                     <div className="h-56 w-full overflow-hidden rounded-md group-hover:opacity-75 lg:h-72 xl:h-80">
                       <img
-                        src={product.imageSrc}
-                        alt={product.imageAlt}
+                        src={product.images[0].src}
+                        alt={product.images[0].alt}
                         className="h-full w-full object-cover object-center"
                       />
                     </div>
                     <h3 className="mt-4 text-sm text-gray-700">
-                      <a href={product.href}>
+                      <Link href={`/product/${product.id}`}>
+                      <a >
                         <span className="absolute inset-0" />
                         {product.name}
                       </a>
+                      </Link>
+                    
                     </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {product.color}
-                    </p>
                     <p className="mt-1 text-sm font-medium text-gray-900">
-                      {product.price}
+                      {`$${product.price}`}
                     </p>
                   </div>
                 ))}

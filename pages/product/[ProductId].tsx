@@ -1,12 +1,45 @@
 import { StarIcon } from '@heroicons/react/solid'
+import { Fragment, useState, useEffect } from 'react'
+import { Dialog, Popover, RadioGroup, Tab, Transition } from '@headlessui/react'
+import {
+  Bars3Icon,
+  CurrencyDollarIcon,
+  GlobeAmericasIcon,
+  MagnifyingGlassIcon,
+  ShoppingBagIcon,
+  UserIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 import Layout from 'components/layout'
 import { classNames } from 'lib'
-import { useEffect, useState } from 'react'
-import { Product } from 'types'
-import { getProduct } from 'utils/apis'
-import { getRecords } from 'utils/function'
-import { useRouter } from 'next/router'
+import { CartItem, ColorType, Product, ProductWithExtra, PropsType, SizeType } from 'types'
 import { useDispatch } from 'react-redux'
+import axios from 'axios'
+import { Base_Url } from 'constans'
+import { addToCart } from 'redux/features/cartSlice'
+
+export const getStaticPaths = async () => {
+  
+    const res = await axios.get(`${Base_Url}/api/products`)
+    const products: ProductWithExtra[] = res.data.products
+    const paths = products.map((product:ProductWithExtra) => {
+      return {
+        params: { ProductId: product.id },
+      }
+    })
+    return { paths, fallback: false }
+}
+
+export const getStaticProps = async (context: {
+  params: { ProductId: string }
+}) => {
+  const id: string = context.params.ProductId
+  const res = await axios.get(`${Base_Url}/api/products/${id}`)
+  const product: ProductWithExtra = res.data.product
+  return {
+    props: { product },
+  }
+}
 
 const reviews = {
   href: '1',
@@ -48,20 +81,16 @@ const reviews = {
   ],
 }
 
-const ProductPage=()=> {
+
+const ProductPage = ({ product }: PropsType) => {
   const [open, setOpen] = useState(false)
-  const [product,setProduct]=useState<Product>()
-  const router = useRouter()
-  const dispatch=useDispatch()
-   const addItem=()=>{
-   }
-  const getProductById=async()=>{
-    const { ProductId } = router.query
-    await getProduct(setProduct,ProductId as string)
+  const [selectedColor, setSelectedColor] = useState<ColorType>(product?.colors[0] as ColorType)
+  const [selectedSize, setSelectedSize] = useState<SizeType>(product?.sizes[0] as SizeType)
+  const dispatch = useDispatch()
+  const addItemToCart = () => {
+    dispatch(addToCart({ ...product, quantity: 1,color:selectedColor.name,size:selectedSize.name } as CartItem))
   }
-  useEffect(()=>{
-    getProductById()
-  },[])
+
   return (
     <Layout>
       <main className="pt-10 sm:pt-8 md:pt-0">
@@ -133,18 +162,106 @@ const ProductPage=()=> {
                 <p className="sr-only">{reviews.average} out of 5 stars</p>
               </div>
             </div>
+            <div className="mt-8 lg:col-span-5">
+              {/* Color picker */}
+              <div>
+                <h2 className="text-sm font-medium text-gray-900">Color</h2>
 
-            <form className="mt-10">
-              
+                <RadioGroup
+                  value={selectedColor}
+                  onChange={setSelectedColor}
+                  className="mt-2"
+                >
+                  <RadioGroup.Label className="sr-only">
+                    Choose a color
+                  </RadioGroup.Label>
+                  <div className="flex items-center space-x-3">
+                    {product?.colors.map((color) => (
+                      <RadioGroup.Option
+                        key={color.name}
+                        value={color}
+                        className={({ active, checked }) =>
+                          classNames(
+                            color.selectedColor,
+                            active && checked ? 'ring ring-offset-1' : '',
+                            !active && checked ? 'ring-2' : '',
+                            'relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none'
+                          )
+                        }
+                      >
+                        <RadioGroup.Label as="span" className="sr-only">
+                          {color.name}
+                        </RadioGroup.Label>
+                        <span
+                          aria-hidden="true"
+                          className={classNames(
+                            color.bgColor,
+                            'h-8 w-8 rounded-full border border-black border-opacity-10'
+                          )}
+                        />
+                      </RadioGroup.Option>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
 
-              <button
-                type="submit"
-                className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                onClick={()=>addItem()}
-              >
-                Add to bag
-              </button>
-            </form>
+              {/* Size picker */}
+              <div className="mt-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-medium text-gray-900">Size</h2>
+                  <a
+                    href="#"
+                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                  >
+                    See sizing chart
+                  </a>
+                </div>
+
+                <RadioGroup
+                  value={selectedSize}
+                  onChange={setSelectedSize}
+                  className="mt-2"
+                >
+                  <RadioGroup.Label className="sr-only">
+                    Choose a size
+                  </RadioGroup.Label>
+                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+                    {product?.sizes.map((size) => (
+                      <RadioGroup.Option
+                        key={size.name}
+                        value={size}
+                        className={({ active, checked }) =>
+                          classNames(
+                            size.inStock
+                              ? 'cursor-pointer focus:outline-none'
+                              : 'cursor-not-allowed opacity-25',
+                            active
+                              ? 'ring-2 ring-indigo-500 ring-offset-2'
+                              : '',
+                            checked
+                              ? 'border-transparent bg-indigo-600 text-white hover:bg-indigo-700'
+                              : 'border-gray-200 bg-white text-gray-900 hover:bg-gray-50',
+                            'flex items-center justify-center rounded-md border py-3 px-3 text-sm font-medium uppercase sm:flex-1'
+                          )
+                        }
+                        disabled={!size.inStock}
+                      >
+                        <RadioGroup.Label as="span">
+                          {size.name}
+                        </RadioGroup.Label>
+                      </RadioGroup.Option>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+
+            <button
+              className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              onClick={() => addItemToCart()}
+            >
+              Add to bag
+            </button>
           </div>
 
           <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pb-16 lg:pr-8">
@@ -153,7 +270,9 @@ const ProductPage=()=> {
               <h3 className="sr-only">Description</h3>
 
               <div className="space-y-6">
-                <p className="text-base text-gray-900">{product?.description}</p>
+                <p className="text-base text-gray-900">
+                  {product?.description}
+                </p>
               </div>
             </div>
 
@@ -168,8 +287,8 @@ const ProductPage=()=> {
                     </li>
                   ))}
                 </ul>
-                  </div>
-            </div> 
+              </div>
+            </div>
 
             <section aria-labelledby="shipping-heading" className="mt-10">
               <h2
