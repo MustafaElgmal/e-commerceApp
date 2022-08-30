@@ -37,8 +37,8 @@ export const orderSlice = createSlice({
     },
     removeFromCart: (state, action: PayloadAction<CartItem>) => {
       state.orders = state.orders.filter(
-        (order) => order.id !== action.payload.id &&
-        order.color !== action.payload.color &&
+        (order) => order.id !== action.payload.id ||
+        order.color !== action.payload.color ||
         order.size !== action.payload.size
       )
       setToStorage('cart', state)
