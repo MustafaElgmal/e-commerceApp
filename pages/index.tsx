@@ -1,4 +1,4 @@
-import type { NextPage } from 'next'
+import type { GetStaticProps, NextPage } from 'next'
 import Layout from 'components/layout'
 import { useEffect, useState } from 'react'
 import { Category, Product, PropsType } from 'types'
@@ -8,13 +8,13 @@ import Link from 'next/link'
 import { useDispatch } from 'react-redux'
 import { setProducts } from 'redux/features/productsSlice'
 
-export const getStaticProps=async()=>{
+export const getStaticProps:GetStaticProps=async()=>{
   let products:Product[]=[],categories:Category[]=[]
   try{
     const res=await axios.get(`${Base_Url}/api/categories`)
     const res2=await axios.get(`${Base_Url}/api/products`)
      categories=res.data.categories
-     products=res2.data.products
+     products=res2.data.products.filter((product:Product)=>product.trending!=='TRUE')
   }catch(e){
     console.log(e)
   }
@@ -106,14 +106,6 @@ const Home: NextPage = ({products,categories}:PropsType) => {
                 <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
                   Mid-Season Sale
                 </h1>
-                <div className="mt-4 sm:mt-6">
-                  <a
-                    href="#"
-                    className="inline-block rounded-md border border-transparent bg-indigo-600 py-3 px-8 font-medium text-white hover:bg-indigo-700"
-                  >
-                    Shop Collection
-                  </a>
-                </div>
               </div>
             </div>
 
@@ -150,10 +142,12 @@ const Home: NextPage = ({products,categories}:PropsType) => {
                             Shop the collection
                           </p>
                           <h3 className="mt-1 font-semibold text-white">
-                            <a href={collection.href}>
+                            <Link href={`/products/${collection.id}`}>
+                            <a >
                               <span className="absolute inset-0" />
                               {collection.name}
                             </a>
+                            </Link>
                           </h3>
                         </div>
                       </div>
@@ -173,12 +167,7 @@ const Home: NextPage = ({products,categories}:PropsType) => {
                 >
                   Trending Products
                 </h2>
-                <a
-                  href="#"
-                  className="hidden text-sm font-medium text-indigo-600 hover:text-indigo-500 md:block"
-                >
-                  Shop the collection<span aria-hidden="true"> &rarr;</span>
-                </a>
+               
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 md:gap-y-0 lg:gap-x-8">
@@ -186,8 +175,8 @@ const Home: NextPage = ({products,categories}:PropsType) => {
                   <div key={product.id} className="group relative">
                     <div className="h-56 w-full overflow-hidden rounded-md group-hover:opacity-75 lg:h-72 xl:h-80">
                       <img
-                        src={product.images[0].src}
-                        alt={product.images[0].alt}
+                        src={product.images[0].imageSrc}
+                        alt={product.images[0].imageAlt}
                         className="h-full w-full object-cover object-center"
                       />
                     </div>
@@ -207,14 +196,7 @@ const Home: NextPage = ({products,categories}:PropsType) => {
                 ))}
               </div>
 
-              <div className="mt-8 text-sm md:hidden">
-                <a
-                  href="#"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  Shop the collection<span aria-hidden="true"> &rarr;</span>
-                </a>
-              </div>
+
             </div>
           </section>
 
