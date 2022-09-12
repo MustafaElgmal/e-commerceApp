@@ -7,9 +7,15 @@ import { Fragment, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from 'redux/app/hookes'
 import { addToCart, removeFromCart } from 'redux/features/cartSlice'
-import { CartItem, Product } from 'types'
-import { getAvailableQty } from 'utils/function'
+import { CartItem, ProductWithExtra} from 'types'
 import Dropdown from './dropdown'
+
+// export const getStaticProps=()=>{
+//   let availableQty=getAvailableQty()
+//   return {
+//     props:{availableQty}
+//   }
+// }
 
 type props = {
   open: boolean
@@ -34,6 +40,17 @@ export default function ShoppingCartDrawer({ open, setOpen }: props) {
       (product) => (sum += parseInt(product.price) * product.quantity)
     )
     setSupTotal(sum)
+  }
+  const getAvailableQty=(product:ProductWithExtra)=>{
+    let availableQty=0
+    for(let i=0;i<product.variants.length;i++){
+      availableQty+=parseInt(product.variants[i].Qty)
+    }
+  
+    return Array.from(
+      Array(availableQty),
+      (_, i) => i + 1
+    )
   }
 
   useEffect(() => {
@@ -138,7 +155,7 @@ export default function ShoppingCartDrawer({ open, setOpen }: props) {
                                             })
                                           )
                                         }}
-                                        values={[1,2,34]}
+                                        values={getAvailableQty(product)}
                                         defaultValue={product.quantity}
                                       />
                                     </p>

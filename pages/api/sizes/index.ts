@@ -1,6 +1,6 @@
 import { colorValidation, sizeValidation } from './../../../utils/validations';
 import { categoryValidation } from '../../../utils/validations'
-import { createRecord, getRecords } from '../../../utils/function'
+import { createRecord, getRecords } from '../../../utils/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { uuid } from 'uuidv4'
 

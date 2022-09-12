@@ -3,7 +3,7 @@ import {
   convertFromSheetsToJson,
   createImageSrc,
   getRecords,
-} from 'utils/function'
+} from 'utils/functions'
 import {
   Category,
   CategoryCreate,

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from 'redux/app/hookes'
 import { addToCart, removeFromCart } from 'redux/features/cartSlice'
-import { CartItem, InfoType } from 'types'
+import { CartItem, InfoType, ProductWithExtra } from 'types'
 import { createOrder } from 'utils/apis'
 import * as Yup from 'yup'
 import { useRouter } from 'next/router'
@@ -50,6 +50,17 @@ export default function Example() {
       (product) => (sum += parseInt(product.price) * product.quantity)
     )
     setSupTotal(sum)
+  }
+  const getAvailableQty=(product:ProductWithExtra)=>{
+    let availableQty=0
+    for(let i=0;i<product.variants.length;i++){
+      availableQty+=parseInt(product.variants[i].Qty)
+    }
+  
+    return Array.from(
+      Array(availableQty),
+      (_, i) => i + 1
+    )
   }
   const formik = useFormik({
     initialValues: {
@@ -746,10 +757,7 @@ export default function Example() {
                                     })
                                   )
                                 }}
-                                values={Array.from(
-                                  Array(parseInt('20')),
-                                  (_, i) => i + 1
-                                )}
+                                values={getAvailableQty(product)}
                                 defaultValue={product.quantity}
                               />
                             </div>

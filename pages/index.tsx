@@ -4,6 +4,7 @@ import { Category, Product, PropsType } from 'types'
 import { Base_Url } from 'constans'
 import axios from 'axios'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 export const getStaticProps:GetStaticProps=async()=>{
   let products:Product[]=[],categories:Category[]=[]

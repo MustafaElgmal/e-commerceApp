@@ -5,7 +5,7 @@ import {
   convertFromSheetsToJson,
   createRecord,
   getRecords,
-} from '../../../utils/function'
+} from '../../../utils/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { uuid } from 'uuidv4'
 

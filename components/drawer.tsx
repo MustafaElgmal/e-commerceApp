@@ -18,7 +18,7 @@ const navigation: Navigation = {
             'Models sitting back to back, wearing Basic Tee in indigo and bone.',
 
           price: '90.00',
-          availableQty: '4',
+          availableQty: '4'
         },
         {
           name: 'Basic Tees',

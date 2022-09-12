@@ -1,5 +1,5 @@
 import { ColorType, SizeType, variantType } from '../../../types/index'
-import { createColors, createSizes } from '../../../utils/function'
+import { createColors, createSizes } from '../../../utils/functions'
 import { ImageType, Product } from 'types'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {
@@ -7,7 +7,7 @@ import {
   createImageSrc,
   createRecord,
   getRecords,
-} from 'utils/function'
+} from 'utils/functions'
 import { productValidation } from 'utils/validations'
 import { uuid } from 'uuidv4'
 

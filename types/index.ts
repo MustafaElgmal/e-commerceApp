@@ -95,6 +95,7 @@ export interface CategoryFeatured {
     id: string
     name: string
     href: string
+    availableQty:string
     price: string
     imageAlt: string
     imageSrc: string

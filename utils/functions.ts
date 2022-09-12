@@ -163,10 +163,14 @@ export const captilize=(name:string)=>{
 
 }
 
-export const getAvailableQty=(product:ProductWithExtra)=>{
-  Array.from(
-    Array(parseInt('20')),
-    (_, i) => i + 1
-  )
-  return [1,2,3,4]
-}
+// export const getAvailableQty=(product:ProductWithExtra)=>{
+//   let avaQty=0
+//   for(let i=0;i<product.variants.length;i++){
+//     avaQty+=parseInt(product.variants[i].Qty)
+//   }
+
+//   return Array.from(
+//     Array(avaQty),
+//     (_, i) => i + 1
+//   )
+// }

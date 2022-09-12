@@ -1,6 +1,6 @@
 import { ProductWithExtra } from './../../../types/index';
 import { Product, ImageType, ColorType, SizeType } from 'types'
-import { getRecords } from './../../../utils/function'
+import { getRecords } from '../../../utils/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(

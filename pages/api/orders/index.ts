@@ -1,11 +1,11 @@
 import { OrderCreate } from './../../../types/index';
-import { captilize } from './../../../utils/function'
+import { captilize } from '../../../utils/functions'
 import {
   createOrderItems,
   generationCode,
-} from '../../../utils/function'
+} from '../../../utils/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createRecord } from 'utils/function'
+import { createRecord } from 'utils/functions'
 import { OrderVaildation } from 'utils/validations'
 import { uuid } from 'uuidv4'
 import sgmail from '@sendgrid/mail'
