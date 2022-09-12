@@ -16,6 +16,7 @@ export default async function handler(
         }
         const data = await getRecords(['product', 'productImages','productVariant'])
         let products:ProductWithExtra[]=data.product.filter((product:Product)=>product.categoryId===id)
+        
 
         products= products.map((product:ProductWithExtra) => {
             const images:ImageType[]  = data.productImages.filter(

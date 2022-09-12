@@ -52,7 +52,7 @@ export const productValidation = async (
   categoryId: string
 ): Promise<errors[]> => {
   let errors: errors[] = []
-  const { name, href, price, description,details,highlights} =
+  const { name, href, price, description,details,highlights,trending} =
     product
   if (!name) {
     errors.push({ message: 'Name is required!' })
@@ -72,6 +72,10 @@ export const productValidation = async (
   }
   if(!details){
     errors.push({ message: ' details is required!' })
+
+  }
+  if(trending===undefined){
+    errors.push({ message: ' trending is required!' })
 
   }
   const categories:{category:Category[]} = await convertFromSheetsToJson(['category'])

@@ -25,6 +25,7 @@ export interface ProductCreate {
   description: string
   details: string
   highlights: string
+  trending:boolean
 }
 export interface Product {
   id: string

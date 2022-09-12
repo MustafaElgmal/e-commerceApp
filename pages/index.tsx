@@ -12,7 +12,7 @@ export const getStaticProps:GetStaticProps=async()=>{
     const res=await axios.get(`${Base_Url}/api/categories`)
     const res2=await axios.get(`${Base_Url}/api/products`)
      categories=res.data.categories
-     products=res2.data.products.filter((product:Product)=>product.trending!=='TRUE')
+     products=res2.data.products.filter((product:Product)=>product.trending==='TRUE')
   }catch(e){
     console.log(e)
   }

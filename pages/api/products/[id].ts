@@ -1,3 +1,4 @@
+import { ProductCreate } from './../../../types/index';
 import { ColorType, SizeType, variantType } from '../../../types/index'
 import { createColors, createSizes } from '../../../utils/functions'
 import { ImageType, Product } from 'types'
@@ -24,9 +25,9 @@ export default async function handler(
       }
       try {
         const Id = uuid()
-        const { name, href, price, description, details, highlights } = req.body
+        const { name, href, price, description, details, highlights,trending }:ProductCreate = req.body
         await createRecord(
-          [Id, name, href, price, description, details, highlights, id],
+          [Id, name, href, price, description, details, highlights,trending.toString(),id as string],
           'product'
         )
         res.status(201).json({ message: 'Product is created!' })

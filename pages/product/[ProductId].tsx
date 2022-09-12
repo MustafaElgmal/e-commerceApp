@@ -5,28 +5,37 @@ import _ from 'lodash.groupby'
 
 import Layout from 'components/layout'
 import { classNames } from 'lib'
-import { CartItem, ColorType, Product, ProductWithExtra, PropsType, SizeType, variantType } from 'types'
+import {
+  CartItem,
+  ColorType,
+  Product,
+  ProductWithExtra,
+  PropsType,
+  SizeType,
+  variantType,
+} from 'types'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import { Base_Url } from 'constans'
 import { addToCart } from 'redux/features/cartSlice'
 import { GetStaticPaths, GetStaticProps } from 'next'
 
-export const getStaticPaths:GetStaticPaths = async () => {
-  
-    const res = await axios.get(`${Base_Url}/api/products`)
-    const products: ProductWithExtra[] = res.data.products
-    const paths = products.map((product:ProductWithExtra) => {
-      return {
-        params: { ProductId: product.id },
-      }
-    })
-    return { paths, fallback: false }
+export const getStaticPaths: GetStaticPaths = async () => {
+  const res = await axios.get(`${Base_Url}/api/products`)
+  const products: ProductWithExtra[] = res.data.products
+  const paths = products.map((product: ProductWithExtra) => {
+    return {
+      params: { ProductId: product.id },
+    }
+  })
+  return { paths, fallback: false }
 }
 
-export const getStaticProps:GetStaticProps = async (context:any) => {
-  const res = await axios.get(`${Base_Url}/api/products/${context.params.ProductId}`)
-  let product:ProductWithExtra=res.data.product
+export const getStaticProps: GetStaticProps = async (context: any) => {
+  const res = await axios.get(
+    `${Base_Url}/api/products/${context.params.ProductId}`
+  )
+  let product: ProductWithExtra = res.data.product
   return {
     props: { product },
   }
@@ -72,18 +81,50 @@ const reviews = {
   ],
 }
 
-
 const ProductPage = ({ product }: PropsType) => {
   const [open, setOpen] = useState(false)
+  const [sizes, setSizes] = useState<SizeType[]>([])
+  const [colors, setColors] = useState<ColorType[]>([])
   const [selectedColor, setSelectedColor] = useState<ColorType>(product?.variants[0].color as ColorType)
-  const [selectedSize, setSelectedSize] = useState<SizeType>(product?.variants[0].size as SizeType)
+  const [selectedSize, setSelectedSize] = useState<SizeType>()
+
   const dispatch = useDispatch()
   const addItemToCart = () => {
-    dispatch(addToCart({ ...product, quantity: 1,color:selectedColor.name,size:selectedSize.name } as CartItem))
+    dispatch(
+      addToCart({
+        ...product,
+        quantity: 1,
+        color: selectedColor?.name,
+        size: selectedSize?.name,
+      } as CartItem)
+    )
   }
-useEffect(()=>{
-  
-},[])
+  const getSizeByColor = (color: ColorType) => {
+    product?.variants.forEach((variant) =>
+      variant.color.id === color.id
+        ? setSizes((prevSize) => [...prevSize, variant.size])
+        : null
+    )
+  }
+  const getuniqueColors = () => {
+    const colors = product?.variants.map((variant) => variant.color)
+    const uniqueColors = Array.from(
+      new Set(colors?.map((color) => JSON.stringify(color))),
+      (color) => JSON.parse(color)
+    )
+    setColors(uniqueColors as ColorType[])
+    setSelectedColor(uniqueColors[0])
+  }
+  useEffect(() => {
+    getuniqueColors()
+  }, [])
+  useEffect(() => {
+    setSizes([])
+    getSizeByColor(selectedColor!)
+  }, [selectedColor])
+  useEffect(() => {
+    setSelectedSize(sizes[0])
+  }, [sizes])
   return (
     <Layout>
       <main className="pt-10 sm:pt-8 md:pt-0">
@@ -169,26 +210,26 @@ useEffect(()=>{
                     Choose a color
                   </RadioGroup.Label>
                   <div className="flex items-center space-x-3">
-                    {product?.variants.map((variant) => (
+                    {colors.map((color: ColorType) => (
                       <RadioGroup.Option
-                        key={variant.color.name}
-                        value={variant.color}
+                        key={color.name}
+                        value={color}
                         className={({ active, checked }) =>
                           classNames(
-                            variant.color.selectedColor,
-                            active && checked ? 'ring ring-offset-1' : '',
-                            !active && checked ? 'ring-2' : '',
+                            color.selectedColor,
+                            active ? 'ring ring-offset-1' : '',
+                            checked ? 'ring-2' : '',
                             'relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none'
                           )
                         }
                       >
                         <RadioGroup.Label as="span" className="sr-only">
-                          {variant.color.name}
+                          {color.name}
                         </RadioGroup.Label>
                         <span
                           aria-hidden="true"
                           className={classNames(
-                            variant.color.bgColor,
+                            color.bgColor,
                             'h-8 w-8 rounded-full border border-black border-opacity-10'
                           )}
                         />
@@ -219,13 +260,13 @@ useEffect(()=>{
                     Choose a size
                   </RadioGroup.Label>
                   <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-                    {product?.variants.map((variant) => (
+                    {sizes.map((size) => (
                       <RadioGroup.Option
-                        key={variant.size.name}
-                        value={variant.size}
+                        key={size.name}
+                        value={size}
                         className={({ active, checked }) =>
                           classNames(
-                            parseInt(variant.Qty)>0
+                            1 > 0
                               ? 'cursor-pointer focus:outline-none'
                               : 'cursor-not-allowed opacity-25',
                             active
@@ -237,10 +278,10 @@ useEffect(()=>{
                             'flex items-center justify-center rounded-md border py-3 px-3 text-sm font-medium uppercase sm:flex-1'
                           )
                         }
-                        disabled={!parseInt(variant.Qty)}
+                        // disabled={!parseInt(size.Qty)}
                       >
                         <RadioGroup.Label as="span">
-                          {variant.size.name}
+                          {size.name}
                         </RadioGroup.Label>
                       </RadioGroup.Option>
                     ))}

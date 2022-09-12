@@ -1,5 +1,5 @@
+import { Category, ColorCreate } from './../../../types/index';
 import { colorValidation } from './../../../utils/validations';
-import { categoryValidation } from '../../../utils/validations'
 import { createRecord, getRecords } from '../../../utils/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { uuid } from 'uuidv4'
@@ -16,7 +16,7 @@ export default async function handler(
       }
       try {
         const id = uuid()
-        const { name,bgColor,selectedColor} = req.body
+        const { name,bgColor,selectedColor}:ColorCreate = req.body
        await createRecord(
           [id,name, bgColor ,selectedColor],
           'color',
@@ -28,7 +28,7 @@ export default async function handler(
       break
     case 'GET':
       try {
-        const categories = await getRecords(['category'])
+        const categories:{category:Category[]} = await getRecords(['category'])
         res.json({ categories: categories.category })
       } catch (e) {
         res.status(500).json({ error: 'Server is down!' })

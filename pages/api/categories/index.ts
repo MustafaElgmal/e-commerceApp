@@ -1,3 +1,4 @@
+import { Category, CategoryCreate } from './../../../types/index';
 import { categoryValidation } from '../../../utils/validations'
 import { createRecord, getRecords } from '../../../utils/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -15,7 +16,7 @@ export default async function handler(
       }
       try {
         const id = uuid()
-        const { name, imageSrc, imageAlt, href } = req.body
+        const { name, imageSrc, imageAlt, href }:CategoryCreate = req.body
         const category = await createRecord(
           [id,name, href, imageSrc, imageAlt],
           'category!A1:E1',
@@ -29,7 +30,7 @@ export default async function handler(
       break
     case 'GET':
       try {
-        const categories = await getRecords(['category'])
+        const categories:{category:Category[]} = await getRecords(['category'])
         res.json({ categories: categories.category })
       } catch (e) {
         res.status(500).json({ error: 'Server is down!' })

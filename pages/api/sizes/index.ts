@@ -1,8 +1,8 @@
-import { colorValidation, sizeValidation } from './../../../utils/validations';
-import { categoryValidation } from '../../../utils/validations'
+import { sizeValidation } from './../../../utils/validations';
 import { createRecord, getRecords } from '../../../utils/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { uuid } from 'uuidv4'
+import { Category } from 'types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,7 +16,7 @@ export default async function handler(
       }
       try {
         const id = uuid()
-        const { name} = req.body
+        const { name}:{name:string} = req.body
         await createRecord(
           [id,name],
           'size',
@@ -28,7 +28,7 @@ export default async function handler(
       break
     case 'GET':
       try {
-        const categories = await getRecords(['category'])
+        const categories:{category:Category[]} = await getRecords(['category'])
         res.json({ categories: categories.category })
       } catch (e) {
         res.status(500).json({ error: 'Server is down!' })
