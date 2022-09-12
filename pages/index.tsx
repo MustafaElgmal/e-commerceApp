@@ -1,12 +1,9 @@
 import type { GetStaticProps, NextPage } from 'next'
 import Layout from 'components/layout'
-import { useEffect, useState } from 'react'
 import { Category, Product, PropsType } from 'types'
 import { Base_Url } from 'constans'
 import axios from 'axios'
 import Link from 'next/link'
-import { useDispatch } from 'react-redux'
-import { setProducts } from 'redux/features/productsSlice'
 
 export const getStaticProps:GetStaticProps=async()=>{
   let products:Product[]=[],categories:Category[]=[]
@@ -195,8 +192,6 @@ const Home: NextPage = ({products,categories}:PropsType) => {
                   </div>
                 ))}
               </div>
-
-
             </div>
           </section>
 

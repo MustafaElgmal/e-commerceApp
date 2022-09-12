@@ -1,5 +1,5 @@
-import { ColorType, SizeType } from './../../../types/index'
-import { createColors, createSizes } from './../../../utils/function'
+import { ColorType, SizeType, variantType } from '../../../types/index'
+import { createColors, createSizes } from '../../../utils/function'
 import { ImageType, Product } from 'types'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {
@@ -15,49 +15,19 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { Id } = req.query
+  const { id } = req.query
   switch (req.method) {
     case 'POST':
-      const errors = await productValidation(req.body, Id as string)
+      const errors = await productValidation(req.body, id as string)
       if (errors.length > 0) {
         return res.status(400).json({ messages: errors })
       }
       try {
-        const id = uuid()
-        let error = await createImageSrc(req.body.images, id)
-        if (error.message !== '') {
-          return res.status(400).send(error)
-        }
-        error = await createColors(req.body.colors, id)
-        if (error.message !== '') {
-          return res.status(400).send(error)
-        }
-        error = await createSizes(req.body.sizes, id)
-        if (error.message !== '') {
-          return res.status(400).send(error)
-        }
-        const {
-          name,
-          href,
-          price,
-          description,
-          details,
-          highlights,
-          availableQty,
-        } = req.body
-         await createRecord(
-          [
-            id,
-            name,
-            href,
-            price,
-            description,
-            details,
-            highlights,
-            availableQty,
-            Id,
-          ],
-          'product!A1:I1'
+        const Id = uuid()
+        const { name, href, price, description, details, highlights } = req.body
+        await createRecord(
+          [Id, name, href, price, description, details, highlights, id],
+          'product'
         )
         res.status(201).json({ message: 'Product is created!' })
       } catch (e) {
@@ -67,29 +37,37 @@ export default async function handler(
       break
     case 'GET':
       try {
-        const data = await getRecords(['product', 'image', 'color', 'size'])
-        
+        const data = (await getRecords([
+          'product',
+          'productImages',
+          'productVariant',
+          'color',
+          'size',
+        ])) as {
+          product: Product[]
+          productImages: ImageType[]
+          productVariant: variantType[]
+          color: ColorType[]
+          size: SizeType[]
+        }
+
         const product = data.product.find(
-          (product: Product) => product.id.toString() === Id
+          (product) => product.id.toString() === id
         )
         if (!product) {
           return res.status(404).json({ message: 'Product is not found!' })
         }
-        const images:ImageType[] = data.image.filter(
-          (image: ImageType) => image.productId === product.id
+        const images = data.productImages.filter(
+          (image) => image.productId === product.id
         )
-        const colors:ColorType[] = data.color.filter(
-          (color: ColorType) => color.productId === product.id
-        )
-        let sizes:SizeType[]=[]
-           data.size.forEach(
-            (size: SizeType) =>{
-              if(size.productId===product.id){
-               sizes.push({...size,inStock:size.inStock==='TRUE'?true:false})
-              }
-            }
-          )
-        res.json({ product: { ...product, images, colors, sizes } })
+        const productVariants = data.productVariant
+          .filter((variant) => variant.productId === id)
+          .map((variant) => ({
+            ...variant,
+            color: data.color.find((color) => color.id === variant.colorId),
+            size: data.size.find((size) => size.id === variant.sizeId),
+          }))
+        res.json({ product: { ...product,images, variants: productVariants } })
       } catch (e) {
         console.log(e)
         res.status(500).json({ error: 'Server is down!' })

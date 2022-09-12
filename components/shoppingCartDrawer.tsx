@@ -2,11 +2,13 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Fragment, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from 'redux/app/hookes'
 import { addToCart, removeFromCart } from 'redux/features/cartSlice'
 import { CartItem, Product } from 'types'
+import { getAvailableQty } from 'utils/function'
 import Dropdown from './dropdown'
 
 type props = {
@@ -16,12 +18,14 @@ type props = {
 
 export default function ShoppingCartDrawer({ open, setOpen }: props) {
   const cart = useAppSelector((state) => state.cart.orders)
+  const router=useRouter()
   const [supTotal, setSupTotal] = useState<number>()
   const dispatch = useDispatch()
   const removeItemFromCart = (product: CartItem) => {
     dispatch(removeFromCart(product))
     if (cart.length === 1) {
       setOpen(false)
+      router.push('/')
     }
   }
   const calcSupTotal = () => {
@@ -92,8 +96,8 @@ export default function ShoppingCartDrawer({ open, setOpen }: props) {
                               <li key={product.id} className="flex py-6">
                                 <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                   <img
-                                    src={product.images[0].src}
-                                    alt={product.images[0].alt}
+                                    src={product.images[0].imageSrc}
+                                    alt={product.images[0].imageAlt}
                                     className="h-full w-full object-cover object-center"
                                   />
                                 </div>
@@ -134,10 +138,7 @@ export default function ShoppingCartDrawer({ open, setOpen }: props) {
                                             })
                                           )
                                         }}
-                                        values={Array.from(
-                                          Array(parseInt(product.availableQty)),
-                                          (_, i) => i + 1
-                                        )}
+                                        values={[1,2,34]}
                                         defaultValue={product.quantity}
                                       />
                                     </p>

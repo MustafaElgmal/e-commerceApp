@@ -1,4 +1,5 @@
-import { Category, Product, User, UserCreate } from '../types/index'
+import { ProductWithExtra } from 'types';
+import { Category, Product } from '../types/index'
 import { google, sheets_v4 } from 'googleapis'
 import { GaxiosResponse } from 'googleapis-common'
 import { extractSheets } from 'spreadsheet-to-json'
@@ -7,14 +8,17 @@ import { uuid } from 'uuidv4'
 import validator from 'validator'
 import sgMail from '@sendgrid/mail'
 
-export const convertFromSheetsToJson = (sheetsName: string[]) => {
+export const convertFromSheetsToJson=(sheetsName: string[]) => {
+  const credentials=JSON.parse(
+    Buffer.from(process.env.GOOGLE_CREDS!,'base64').toString()
+  )
   const data = extractSheets(
     {
       spreadsheetKey: process.env.SHEETID,
-      credentials: require('../credentials.json'),
+      credentials:credentials,
       sheetsToExtract: sheetsName,
     },
-    async (err: React.ChangeEvent<HTMLInputElement>, data: any) => {
+    async (err: React.ChangeEvent<HTMLInputElement>, data:any) => {
       if (data) {
         return data
       } else {
@@ -27,7 +31,6 @@ export const convertFromSheetsToJson = (sheetsName: string[]) => {
 
 export const getRecords = async (sheetsName: string[]) => {
   try {
-    
     const rows = await convertFromSheetsToJson(sheetsName)
     return rows
   } catch (e) {
@@ -80,7 +83,7 @@ export const createOrderItems = async (
         return { message: 'Product not found!' }
       }
       const id = uuid()
-      await createRecord([id,item.productId,item.Qty.toString(), orderId], 'orderItem!A1:D1')
+      await createRecord([id,orderId,item.productId,item.Qty.toString()], 'orderline')
     }
     return { message: '' }
   } catch (e) {
@@ -89,17 +92,17 @@ export const createOrderItems = async (
 }
 
 export const createImageSrc = async (
-  images: { src: string; alt: string }[],
+  images: { imageSrc: string; imageAlt: string }[],
   productId: string
 ) => {
   try {
     for (let i = 0; i < images.length; i++) {
-      if (!validator.isURL(images[i].src)) {
+      if (!validator.isURL(images[i].imageSrc)) {
         return { message: 'image is  not vaild!' }
       }
       const id = uuid()
       await createRecord(
-        [id, images[i].src, images[i].alt, productId],
+        [id, images[i].imageSrc, images[i].imageAlt, productId],
         'image!A1:D1'
       )
     }
@@ -110,8 +113,7 @@ export const createImageSrc = async (
 }
 
 export const createColors = async (
- colors: { name:string, bgColor:string, selectedColor:string}[],
-  productId: string
+ colors: { name:string, bgColor:string, selectedColor:string}[]
 ) => {
   try {
     for (let i = 0; i < colors.length; i++) {
@@ -120,7 +122,7 @@ export const createColors = async (
       }
       const id = uuid()
       await createRecord(
-        [id, colors[i].name, colors[i].bgColor,colors[i].selectedColor, productId],
+        [id, colors[i].name, colors[i].bgColor,colors[i].selectedColor],
         'color!A1:E1'
       )
     }
@@ -131,17 +133,13 @@ export const createColors = async (
 }
 
 export const createSizes = async (
-  sizes: { name:string, inStock:boolean}[],
-   productId: string
+  sizes: { name:string}[]
  ) => {
    try {
      for (let i = 0; i < sizes.length; i++) {
-       if(!sizes[i].name||!sizes[i].inStock){
-         return {message:'Please enter vaild sizes!'}
-       }
        const id = uuid()
        await createRecord(
-         [id, sizes[i].name,sizes[i].inStock.toString(), productId],
+         [id, sizes[i].name],
          'size!A1:D1'
        )
      }
@@ -163,4 +161,12 @@ export const captilize=(name:string)=>{
   const newName=name.split(" ").map((word)=>word[0].toUpperCase()+word.slice(1)).join(" ")
   return newName
 
+}
+
+export const getAvailableQty=(product:ProductWithExtra)=>{
+  Array.from(
+    Array(parseInt('20')),
+    (_, i) => i + 1
+  )
+  return [1,2,3,4]
 }

@@ -3,80 +3,6 @@ export interface PropsType {
   categories?: Category[]
   product?: ProductWithExtra
 }
-export interface ProductCreate {
-  name: string
-  href: string
-  price: string
-  availableQty: string
-  images: { src: string; alt: string }[]
-  colors: {
-    name: string
-    bgColor: string
-    selectedColor: string
-  }[]
-  sizes: {
-    name: string
-    inStock: boolean
-  }[]
-  
-  description: string
-  details: string
-  highlights: string
-}
-export interface Product {
-  id: string
-  name: string
-  href: string
-  price: string
-  availableQty: string
-  description: string
-  details: string
-  highlights: string,
-  categoryId:string
-}
-export interface ProductWithExtra extends Product{
-  images: ImageType[]
-  colors:ColorType[]
-  sizes:SizeType[]
-}
-export interface CartItem extends ProductWithExtra {
-  quantity: number,
-  color:string,
-  size:string
-}
-export interface ImageType {
-  id: string
-  src: string
-  alt: string
-  productId: string
-}
-export interface ColorType {
-  id:string
-  name: string
-  bgColor: string
-  selectedColor: string
-  productId:string
-}
-export interface SizeType {
-  id:string
-  name: string
-  inStock: string|boolean
-  productId:string
-}
-
-
-export interface UserCreate {
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-}
-export interface User extends UserCreate {
-  id: string
-}
-export interface errors {
-  message: string
-}
 
 export interface CategoryCreate {
   name: string
@@ -87,6 +13,82 @@ export interface CategoryCreate {
 export interface Category extends CategoryCreate {
   id: string
 }
+
+export interface SubCategory extends Category {
+  categoryId: string
+}
+
+export interface ProductCreate {
+  name: string
+  href: string
+  price: string
+  description: string
+  details: string
+  highlights: string
+}
+export interface Product {
+  id: string
+  name: string
+  href: string
+  price: string
+  description: string
+  details: string
+  highlights: string
+  categoryId: string
+  trending: string
+}
+export interface ProductWithExtra extends Product {
+  images: ImageType[]
+  variants: {
+    id: string
+    colorId: string
+    sizeId: string
+    productId: string
+    Qty: string
+    color: ColorType
+    size: SizeType
+  }[]
+}
+export interface CartItem extends ProductWithExtra {
+  quantity: number
+  color: string
+  size: string
+}
+export interface ImageCreate {
+  imageSrc: string
+  imageAlt: string
+  productId: string
+}
+export interface ImageType extends ImageCreate {
+  id: string
+}
+export interface ColorCreate {
+  name: string
+  bgColor: string
+  selectedColor: string
+}
+export interface ColorType extends ColorCreate {
+  id: string
+}
+export interface SizeCreate {
+  name: string
+}
+export interface SizeType extends SizeCreate {
+  id: string
+}
+
+export interface variantType {
+  id: string
+  colorId: string
+  sizeId: string
+  productId: string
+  Qty: string
+}
+
+export interface errors {
+  message: string
+}
+
 export interface CategoryFeatured {
   name: string
   featured: {
@@ -94,7 +96,6 @@ export interface CategoryFeatured {
     name: string
     href: string
     price: string
-    availableQty: string
     imageAlt: string
     imageSrc: string
   }[]

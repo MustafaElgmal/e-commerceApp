@@ -4,7 +4,6 @@ import { classNames } from 'lib'
 import Link from 'next/link'
 import { Fragment, useState } from 'react'
 import { useAppSelector } from 'redux/app/hookes'
-import Drawer from './drawer'
 import ShoppingCartDrawer from './shoppingCartDrawer'
 const navigation = {
   categories: [

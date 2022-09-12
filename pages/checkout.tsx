@@ -4,12 +4,11 @@ import Dropdown from 'components/dropdown'
 import Layout from 'components/layout'
 import { useFormik } from 'formik'
 import { classNames } from 'lib'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from 'redux/app/hookes'
-import { addToCart, removeFromCart, resetCart } from 'redux/features/cartSlice'
-import { CartItem, InfoType, Product } from 'types'
+import { addToCart, removeFromCart } from 'redux/features/cartSlice'
+import { CartItem, InfoType } from 'types'
 import { createOrder } from 'utils/apis'
 import * as Yup from 'yup'
 import { useRouter } from 'next/router'
@@ -37,10 +36,10 @@ export default function Example() {
   )
   const cart = useAppSelector((state) => state.cart.orders)
   const dispatch = useDispatch()
-  
+
   const removeItemFromCart = (product: CartItem) => {
     dispatch(removeFromCart(product))
-    if(cart.length===1){
+    if (cart.length === 1) {
       router.push('/')
     }
   }
@@ -124,14 +123,12 @@ export default function Example() {
         deliveryMethod,
       }
       if (cart.length > 0) {
-        await createOrder({ ...info, orderItems })
+        console.log({ ...info, orderItems })
+        await createOrder({ ...info, orderItems },dispatch,router)
       } else {
         alert('No Product in cart!')
       }
       formik.resetForm()
-      dispatch(resetCart())
-      router.push('/')
-
     },
   })
   useEffect(() => {
@@ -171,7 +168,9 @@ export default function Example() {
                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       />
                       {formik.errors.email && formik.touched.email ? (
-                        <p className="text-red-600/100">{formik.errors.email}</p>
+                        <p className="text-red-600/100">
+                          {formik.errors.email}
+                        </p>
                       ) : null}
                     </div>
                   </div>
@@ -228,7 +227,9 @@ export default function Example() {
                           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                         {formik.errors.lastName && formik.touched.lastName ? (
-                          <p className="text-red-600/100">{formik.errors.lastName}</p>
+                          <p className="text-red-600/100">
+                            {formik.errors.lastName}
+                          </p>
                         ) : null}
                       </div>
                     </div>
@@ -252,7 +253,9 @@ export default function Example() {
                         />
                       </div>
                       {formik.errors.company && formik.touched.company ? (
-                        <p className="text-red-600/100">{formik.errors.company}</p>
+                        <p className="text-red-600/100">
+                          {formik.errors.company}
+                        </p>
                       ) : null}
                     </div>
 
@@ -275,7 +278,9 @@ export default function Example() {
                           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                         {formik.errors.address && formik.touched.address ? (
-                          <p className="text-red-600/100">{formik.errors.address}</p>
+                          <p className="text-red-600/100">
+                            {formik.errors.address}
+                          </p>
                         ) : null}
                       </div>
                     </div>
@@ -324,7 +329,9 @@ export default function Example() {
                           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                         {formik.errors.city && formik.touched.city ? (
-                          <p className="text-red-600/100">{formik.errors.city}</p>
+                          <p className="text-red-600/100">
+                            {formik.errors.city}
+                          </p>
                         ) : null}
                       </div>
                     </div>
@@ -351,7 +358,9 @@ export default function Example() {
                           <option value="Mexico">Mexico</option>
                         </select>
                         {formik.errors.country && formik.touched.country ? (
-                          <p className="text-red-600/100">{formik.errors.country}</p>
+                          <p className="text-red-600/100">
+                            {formik.errors.country}
+                          </p>
                         ) : null}
                       </div>
                     </div>
@@ -375,7 +384,9 @@ export default function Example() {
                           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                         {formik.errors.state && formik.touched.state ? (
-                          <p className="text-red-600/100">{formik.errors.state}</p>
+                          <p className="text-red-600/100">
+                            {formik.errors.state}
+                          </p>
                         ) : null}
                       </div>
                     </div>
@@ -649,7 +660,9 @@ export default function Example() {
                           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                         {formik.errors.cvc && formik.touched.cvc ? (
-                          <p className="text-red-600/100">{formik.errors.cvc}</p>
+                          <p className="text-red-600/100">
+                            {formik.errors.cvc}
+                          </p>
                         ) : null}
                       </div>
                     </div>
@@ -670,8 +683,8 @@ export default function Example() {
                       <li key={product.id} className="flex py-6 px-4 sm:px-6">
                         <div className="flex-shrink-0">
                           <img
-                            src={product.images[0].src}
-                            alt={product.images[0].alt}
+                            src={product.images[0].imageSrc}
+                            alt={product.images[0].imageAlt}
                             className="w-20 rounded-md"
                           />
                         </div>
@@ -687,7 +700,16 @@ export default function Example() {
                                   {product.name}
                                 </a>
                               </h4>
+                              <div className="mt-1 flex text-sm">
+                              <p className="text-gray-500">{product.color}</p>
+                              {product.size ? (
+                                <p className="ml-4 border-l border-gray-200 pl-4 text-gray-500">
+                                  {product.size}
+                                </p>
+                              ) : null}
                             </div>
+                            </div>
+                           
 
                             <div className="ml-4 flow-root flex-shrink-0">
                               <button
@@ -695,15 +717,12 @@ export default function Example() {
                                 className="-m-2.5 flex items-center justify-center bg-white p-2.5 text-gray-400 hover:text-gray-500"
                               >
                                 <span className="sr-only">Remove</span>
-                              
-                                    <TrashIcon
-                                      className="h-5 w-5"
-                                      aria-hidden="true"
-                                      onClick={() =>
-                                        removeItemFromCart(product)
-                                      }
-                                    />
-                                
+
+                                <TrashIcon
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                  onClick={() => removeItemFromCart(product)}
+                                />
                               </button>
                             </div>
                           </div>
@@ -712,18 +731,23 @@ export default function Example() {
                             <p className="mt-1 text-sm font-medium text-gray-900">
                               {`$${product.price}`}
                             </p>
+                            
 
                             <div className="ml-4">
                               <label htmlFor="quantity" className="sr-only">
                                 Quantity
                               </label>
                               <Dropdown
-                                 onChange={(value) => {
-                                  dispatch(addToCart({...product,quantity:parseInt(value)}))
-                          
+                                onChange={(value) => {
+                                  dispatch(
+                                    addToCart({
+                                      ...product,
+                                      quantity: parseInt(value),
+                                    })
+                                  )
                                 }}
                                 values={Array.from(
-                                  Array(parseInt(product.availableQty)),
+                                  Array(parseInt('20')),
                                   (_, i) => i + 1
                                 )}
                                 defaultValue={product.quantity}
@@ -767,7 +791,7 @@ export default function Example() {
 
                   <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
                     <button
-                      type='button'
+                      type="button"
                       onClick={() => formik.handleSubmit()}
                       className="w-full rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
                     >

@@ -1,24 +1,18 @@
 import { StarIcon } from '@heroicons/react/solid'
 import { Fragment, useState, useEffect } from 'react'
 import { Dialog, Popover, RadioGroup, Tab, Transition } from '@headlessui/react'
-import {
-  Bars3Icon,
-  CurrencyDollarIcon,
-  GlobeAmericasIcon,
-  MagnifyingGlassIcon,
-  ShoppingBagIcon,
-  UserIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+import _ from 'lodash.groupby'
+
 import Layout from 'components/layout'
 import { classNames } from 'lib'
-import { CartItem, ColorType, Product, ProductWithExtra, PropsType, SizeType } from 'types'
+import { CartItem, ColorType, Product, ProductWithExtra, PropsType, SizeType, variantType } from 'types'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import { Base_Url } from 'constans'
 import { addToCart } from 'redux/features/cartSlice'
+import { GetStaticPaths, GetStaticProps } from 'next'
 
-export const getStaticPaths = async () => {
+export const getStaticPaths:GetStaticPaths = async () => {
   
     const res = await axios.get(`${Base_Url}/api/products`)
     const products: ProductWithExtra[] = res.data.products
@@ -30,12 +24,9 @@ export const getStaticPaths = async () => {
     return { paths, fallback: false }
 }
 
-export const getStaticProps = async (context: {
-  params: { ProductId: string }
-}) => {
-  const id: string = context.params.ProductId
-  const res = await axios.get(`${Base_Url}/api/products/${id}`)
-  const product: ProductWithExtra = res.data.product
+export const getStaticProps:GetStaticProps = async (context:any) => {
+  const res = await axios.get(`${Base_Url}/api/products/${context.params.ProductId}`)
+  let product:ProductWithExtra=res.data.product
   return {
     props: { product },
   }
@@ -84,13 +75,15 @@ const reviews = {
 
 const ProductPage = ({ product }: PropsType) => {
   const [open, setOpen] = useState(false)
-  const [selectedColor, setSelectedColor] = useState<ColorType>(product?.colors[0] as ColorType)
-  const [selectedSize, setSelectedSize] = useState<SizeType>(product?.sizes[0] as SizeType)
+  const [selectedColor, setSelectedColor] = useState<ColorType>(product?.variants[0].color as ColorType)
+  const [selectedSize, setSelectedSize] = useState<SizeType>(product?.variants[0].size as SizeType)
   const dispatch = useDispatch()
   const addItemToCart = () => {
     dispatch(addToCart({ ...product, quantity: 1,color:selectedColor.name,size:selectedSize.name } as CartItem))
   }
-
+useEffect(()=>{
+  
+},[])
   return (
     <Layout>
       <main className="pt-10 sm:pt-8 md:pt-0">
@@ -98,31 +91,31 @@ const ProductPage = ({ product }: PropsType) => {
         <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
           <div className="aspect-w-3 aspect-h-4 hidden overflow-hidden rounded-lg lg:block">
             <img
-              src={product?.images[0].src}
-              alt={product?.images[0].alt}
+              src={product?.images[0].imageSrc}
+              alt={product?.images[0].imageAlt}
               className="h-full w-full object-cover object-center"
             />
           </div>
           <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
             <div className="aspect-w-3 aspect-h-2 overflow-hidden rounded-lg">
               <img
-                src={product?.images[1].src}
-                alt={product?.images[1].alt}
+                src={product?.images[1].imageSrc}
+                alt={product?.images[1].imageAlt}
                 className="h-full w-full object-cover object-center"
               />
             </div>
             <div className="aspect-w-3 aspect-h-2 overflow-hidden rounded-lg">
               <img
-                src={product?.images[2].src}
-                alt={product?.images[2].alt}
+                src={product?.images[2].imageSrc}
+                alt={product?.images[2].imageAlt}
                 className="h-full w-full object-cover object-center"
               />
             </div>
           </div>
           <div className="aspect-w-4 aspect-h-5 sm:overflow-hidden sm:rounded-lg lg:aspect-w-3 lg:aspect-h-4">
             <img
-              src={product?.images[3].src}
-              alt={product?.images[3].alt}
+              src={product?.images[3].imageSrc}
+              alt={product?.images[3].imageAlt}
               className="h-full w-full object-cover object-center"
             />
           </div>
@@ -176,13 +169,13 @@ const ProductPage = ({ product }: PropsType) => {
                     Choose a color
                   </RadioGroup.Label>
                   <div className="flex items-center space-x-3">
-                    {product?.colors.map((color) => (
+                    {product?.variants.map((variant) => (
                       <RadioGroup.Option
-                        key={color.name}
-                        value={color}
+                        key={variant.color.name}
+                        value={variant.color}
                         className={({ active, checked }) =>
                           classNames(
-                            color.selectedColor,
+                            variant.color.selectedColor,
                             active && checked ? 'ring ring-offset-1' : '',
                             !active && checked ? 'ring-2' : '',
                             'relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none'
@@ -190,12 +183,12 @@ const ProductPage = ({ product }: PropsType) => {
                         }
                       >
                         <RadioGroup.Label as="span" className="sr-only">
-                          {color.name}
+                          {variant.color.name}
                         </RadioGroup.Label>
                         <span
                           aria-hidden="true"
                           className={classNames(
-                            color.bgColor,
+                            variant.color.bgColor,
                             'h-8 w-8 rounded-full border border-black border-opacity-10'
                           )}
                         />
@@ -226,13 +219,13 @@ const ProductPage = ({ product }: PropsType) => {
                     Choose a size
                   </RadioGroup.Label>
                   <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-                    {product?.sizes.map((size) => (
+                    {product?.variants.map((variant) => (
                       <RadioGroup.Option
-                        key={size.name}
-                        value={size}
+                        key={variant.size.name}
+                        value={variant.size}
                         className={({ active, checked }) =>
                           classNames(
-                            size.inStock
+                            parseInt(variant.Qty)>0
                               ? 'cursor-pointer focus:outline-none'
                               : 'cursor-not-allowed opacity-25',
                             active
@@ -244,10 +237,10 @@ const ProductPage = ({ product }: PropsType) => {
                             'flex items-center justify-center rounded-md border py-3 px-3 text-sm font-medium uppercase sm:flex-1'
                           )
                         }
-                        disabled={!size.inStock}
+                        disabled={!parseInt(variant.Qty)}
                       >
                         <RadioGroup.Label as="span">
-                          {size.name}
+                          {variant.size.name}
                         </RadioGroup.Label>
                       </RadioGroup.Option>
                     ))}

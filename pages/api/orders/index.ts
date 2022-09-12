@@ -1,10 +1,9 @@
+import { OrderCreate } from './../../../types/index';
 import { captilize } from './../../../utils/function'
 import {
   createOrderItems,
   generationCode,
-  getRecords,
 } from '../../../utils/function'
-import { google } from 'googleapis'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createRecord } from 'utils/function'
 import { OrderVaildation } from 'utils/validations'
@@ -38,12 +37,13 @@ export default async function handler(
           postalCode,
           deliveryMethod,
           orderItems,
-        } = req.body
+        }:OrderCreate = req.body
+
         const error = await createOrderItems(orderItems, id)
         if (error.message !== '') {
           return res.status(400).send(error)
         }
-        const order = await createRecord(
+         await createRecord(
           [
             id,
             firstName,
@@ -59,7 +59,7 @@ export default async function handler(
             postalCode,
             deliveryMethod,
           ],
-          'order!A1:M1'
+          'order'
         )
         sendingConvermationEmail(email, firstName)
         res.json({ message: 'Order is created!' })

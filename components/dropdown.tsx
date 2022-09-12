@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 type props = {
-  values: string[] | number[]
+  values:number[]
   defaultValue?: string | number
   onChange: (value: string) => void
 }

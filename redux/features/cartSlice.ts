@@ -17,11 +17,12 @@ export const orderSlice = createSlice({
           order.size === action.payload.size
       )
       if (!order) {
-        if(parseInt(action.payload.availableQty)>=action.payload.quantity){
-          state.orders = [...state.orders, action.payload]
-        }else{
-          alert('Product out of stock!')
-        }
+        state.orders = [...state.orders, action.payload]
+        // if(parseInt(action.payload.availableQty)>=action.payload.quantity){
+          
+        // }else{
+        //   alert('Product out of stock!')
+        // }
         
         
       } else {
