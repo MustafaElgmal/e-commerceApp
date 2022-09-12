@@ -3,8 +3,7 @@ import Layout from "components/layout"
 import { Base_Url } from "constans"
 import { GetStaticPaths, GetStaticProps } from "next"
 import Link from "next/link"
-import { useEffect } from "react"
-import { Product, ProductWithExtra, PropsType } from "types"
+import {ProductWithExtra, PropsType } from "types"
 
 
 export const getStaticPaths:GetStaticPaths = async () => {
@@ -13,7 +12,7 @@ export const getStaticPaths:GetStaticPaths = async () => {
   const products: ProductWithExtra[] = res.data.products
   const paths = products.map((product:ProductWithExtra) => {
     return {
-      params: { categoryId: product.categoryId },
+      params: { CategoryId: product.categoryId },
     }
   })
   return { paths, fallback: false }
@@ -22,7 +21,7 @@ export const getStaticPaths:GetStaticPaths = async () => {
 export const getStaticProps:GetStaticProps=async(context:any)=>{
   let products:ProductWithExtra[]=[]
   try{
-    const res=await axios.get(`${Base_Url}/api/products/category/${context.params.categoryId}`)
+    const res=await axios.get(`${Base_Url}/api/products/category/${context.params.CategoryId}`)
      products=res.data.products
 
   }catch(e){
